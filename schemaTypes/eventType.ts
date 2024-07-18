@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {CalendarIcon} from '@sanity/icons'
+import doorsOpenInput from '../components/doorsOpenInput'
 
 export const eventType = defineType({
   name: 'event',
@@ -49,6 +50,9 @@ export const eventType = defineType({
       description: 'Number of minutes before the start time for the admission',
       type: 'number',
       initialValue: 60,
+      components: {
+        input: doorsOpenInput
+      }
     }),
 
     defineField({
@@ -94,17 +98,35 @@ export const eventType = defineType({
       group: 'details',
     }),
   ],
-  preview:{
-    select :{
-        title: 'name',
-        venue: 'venue.name',
-        artist: 'headline.name',
-        date: 'date',
-        image: 'image',
+  
+  // Update the preview key in the schema
+preview: {
+  select: {
+    name: 'name',
+    venue: 'venue.name',
+    artist: 'headline.name',
+    date: 'date',
+    image: 'image',
+  },
+  prepare({name, venue, artist, date, image}) {
+    const nameFormatted = name || 'Untitled event'
+    const dateFormatted = date
+      ? new Date(date).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+        })
+      : 'No date'
+
+    return {
+      title: artist ? `${nameFormatted} (${artist})` : nameFormatted,
+      subtitle: venue ? `${dateFormatted} at ${venue}` : dateFormatted,
+      media: image || CalendarIcon,
     }
   },
-
+},
   
-
 
 })
